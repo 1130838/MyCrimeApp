@@ -1,5 +1,6 @@
 package com.brunodevesa.mycrimeapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -37,7 +38,7 @@ public class CrimeListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
 
-        mCrimeRecyclerView = (RecyclerView)view.findViewById(R.id.crime_recycler_view);
+        mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         updateUI();
@@ -45,16 +46,30 @@ public class CrimeListFragment extends Fragment {
         return view;
     }
 
+    // so the recyclerView can be updated when changes in detail happens
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimesList();
 
-        mCrimeAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        if (mCrimeAdapter == null) {
+
+            mCrimeAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        }
+        else{
+            mCrimeAdapter.notifyDataSetChanged();
+        }
     }
 
+
     // VIEW HOLDER ( define what u want to show in the Recycler List )
-    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Crime mCrime;
         //public TextView mTitleTextView;
@@ -69,12 +84,12 @@ public class CrimeListFragment extends Fragment {
             // all the widgets in the xml file View will be initialize here
             mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
             mDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
-            mSolvedCheckBox = (CheckBox)itemView.findViewById(R.id.list_item_crime_solved_check_box);
+            mSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
 
         }
 
         // define what the widgets will have in relation to the model
-        public void bindCrime(Crime crime){
+        public void bindCrime(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDate().toString());
@@ -84,13 +99,21 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(getActivity(), "You clicked crime #" + mCrime.getTitle(), Toast.LENGTH_SHORT).show();
+
+
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getiD());
+            startActivity(intent);
+
+            //Intent intent = new Intent(getActivity(), CrimeActivity.class);
+            //startActivity(intent);
+
+            //Toast.makeText(getActivity(), "You clicked crime #" + mCrime.getTitle(), Toast.LENGTH_SHORT).show();
         }
     }
 
 
     // ADAPTER
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
+    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
 
         public CrimeAdapter(List<Crime> crimes) {
             mCrimes = crimes;

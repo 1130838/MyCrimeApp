@@ -2,6 +2,7 @@ package com.brunodevesa.mycrimeapp;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -11,12 +12,15 @@ import android.view.View;
 
 import com.brunodevesa.mycrimeapp.model.Crime;
 
+import java.util.UUID;
+
 public class CrimeActivity extends SingleFragmentActivity {
 
-    @Override
+   /* @Override
     protected Fragment createFragment() {
+
         return new CrimeFragment();
-    }
+    }*/
 
 
 /*    @Override
@@ -34,5 +38,26 @@ public class CrimeActivity extends SingleFragmentActivity {
 
     }*/
 
+
+
+
+    // Intent and Key to receive the Intent
+
+    private static final String EXTRA_CRIME_ID = "com.brunodevesa.mycrimeapp.crime_id";
+
+
+    protected Fragment createFragment(){
+    UUID crimeId = (UUID)getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+        return CrimeFragment.newInstance(crimeId);
+    }
+
+
+    // start a new Activity from a fragment:
+    public static Intent newIntent(Context pacakgeContext,UUID crimeId){
+        Intent intent = new Intent(pacakgeContext, CrimeActivity.class);
+        intent.putExtra(EXTRA_CRIME_ID, crimeId);
+        return intent;
+
+    }
 
 }
